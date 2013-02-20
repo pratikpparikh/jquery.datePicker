@@ -6,7 +6,7 @@
       return this;
     }
 
-    var defaults = {selected: null, minimumDate: null, maximumDate: null};
+    var defaults = {selected: null, minimumDate: null, maximumDate: null,iwItem:null};
     var months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
     var abbreviations = new Array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec');
     var daySelector = 'td:not(.m):not(:empty)';
@@ -35,28 +35,49 @@
         show: function() { $container.show(); },
         hide: function() { $container.hide(); },
         loadPrevious: function() {
-          $container.empty().append(self.buildMonth(new Date(currentDate.getFullYear(), currentDate.getMonth()-1, 1)));
+          var monthYearHandler = $container.find("div.month");
+            var monthYearArray = monthYearHandler.text().split(" ");
+            var monthName = monthYearArray[0];
+            var year =  monthYearArray[1];
+            var currentMonth = $.inArray(monthName,months)
+            $container.empty().append(self.buildMonth(new Date(year, currentMonth-1, 1)));
         },
         loadNext: function() {
-          $container.empty().append(self.buildMonth(new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 1)));
+        	var monthYearHandler = $container.find("div.month");
+            var monthYearArray = monthYearHandler.text().split(" ");
+            var monthName = monthYearArray[0];
+            var year =  monthYearArray[1];
+            var currentMonth = $.inArray(monthName,months)
+            $container.empty().append(self.buildMonth(new Date(year, currentMonth+1, 1)));
         },
         hover: function() {
           $(this).toggleClass('hover');
         },
         clicked: function() {
-          var $cell = $(this);
+          var $cell = $(this);         
           if (mode == 'month') {
-            $container.empty().append(self.buildMonth(new Date(currentDate.getFullYear(), (4*($cell.parent().index()-1)) + $cell.index(), 1)));
+        	  var year = $($($($(this).parent()).parent()).find("td.year")).text();
+        	  $container.empty().append(self.buildMonth(new Date(year, (4*($cell.parent().index()-1)) + $cell.index(), 1)));
           } else if (mode == 'year') {
             currentDate = new Date($cell.text(), 0, 1);
-            self.pickMonth();
+            self.pickMonth(new Date($cell.text(), 0, 1));
           } else {
-            $container.find('td.selected').removeClass('selected');
-            $cell.addClass('selected');
-            var date = new Date(currentDate.getFullYear(), currentDate.getMonth(), $cell.text());
-            $input.val(self.format(date)).change();
-            if (options.selected != null) { options.selected(date, $cell); }
-            self.hide();
+			var monthYearHandler = $container.find("div.month");
+			var monthYearArray = monthYearHandler.text().split(" ");
+			var monthName = monthYearArray[0];
+			var year =  monthYearArray[1];
+			var currentMonth = $.inArray(monthName,months)
+			$container.find('td.selected').removeClass('selected');
+			$cell.addClass('selected');            
+			var date = new Date(year, currentMonth, $cell.text());
+			$input.val(self.format(date)).change();
+			if(options.iwItem)
+			{
+				options.iwItem.setValue(self.formatISO(date));
+				options.iwItem.setReadOnly(true);
+			}
+			if (options.selected != null) { options.selected(date, $cell); }
+			self.hide();
           }
         },
         entered: function() {
@@ -69,9 +90,10 @@
         },
         pickYear: function() {
           mode = 'year';
+          var year =  $container.find("td.year").text()
           var table = document.createElement('table');
-          var start = currentDate.getFullYear() - 6;
-          if (options.minimumDate && options.minimumDate > start) { start = options.minimumDate; }
+          var start = year - 6;
+          if (options.minimumDate && options.minimumDate > start) { start = options.minimumDate.getFullYear(); }
           for (var i = 0; i < 3; ++i) {
             var row = table.insertRow(-1);
             for (var j = 0; j < 4; ++j) {
@@ -81,15 +103,25 @@
           }
           $container.empty().append(table);
         },
-        pickMonth: function() {
+        pickMonth: function(startDateOfNewYear) {
           mode = 'month';
+          var monthYearHandler = $($container.find("div.month"));
+          var yearString = "";
+          if(startDateOfNewYear === 'undefined' || !(startDateOfNewYear instanceof Date))
+          {
+        	  var monthYearArray = monthYearHandler.text().split(" ");
+	          var monthName = monthYearArray[0];
+	          yearString =  monthYearArray[1];
+          }else{
+	          yearString =  startDateOfNewYear.getFullYear();
+          }
           var table = document.createElement('table');
           var header = table.insertRow(-1);
           var year = header.insertCell(-1);
           year.colSpan = 4;
           year.className = 'm year';
-          year.innerHTML = currentDate.getFullYear();
-
+          year.innerHTML = yearString;
+          
           //could make this static...
           for (var i = 0; i < 3; ++i) {
             var row = table.insertRow(-1);
@@ -138,6 +170,29 @@
         },
         format: function(date) {
           return months[date.getMonth()] + ' ' + date.getDate() + ' ' + date.getFullYear();
+        },
+        formatISO:function(date){
+        	var addNowTime = false;
+        	if(date == null)
+		    {
+        		date = new Date();
+		    }
+			var twoDigitMonth = date.getMonth() + 1+"";
+			if(twoDigitMonth.length==1){
+				twoDigitMonth="0" +twoDigitMonth;
+			}
+			var twoDigitDate = date.getDate()+"";
+			if(twoDigitDate.length==1){
+				twoDigitDate="0" +twoDigitDate;
+			}
+			var time = "";
+			if(addNowTime == true){ 
+				time = "T" + formatTimeOfDay($.now());
+			}else{ 
+				time = "T00:00:00";
+			}
+			var returnDateTime = twoDigitDate + "/" + twoDigitMonth + "/" + date.getFullYear() + time;
+			return returnDateTime;
         }
       };
       this.datePicker = self;
