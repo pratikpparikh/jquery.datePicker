@@ -191,7 +191,7 @@
 			}else{ 
 				time = "T00:00:00";
 			}
-			var returnDateTime = twoDigitDate + "/" + twoDigitMonth + "/" + date.getFullYear() + time;
+			var returnDateTime = twoDigitMonth + "/" + twoDigitDate + "/" + date.getFullYear() + time;
 			return returnDateTime;
         }
       };
