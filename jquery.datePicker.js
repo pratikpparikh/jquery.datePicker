@@ -187,9 +187,9 @@
 			}
 			var time = "";
 			if(addNowTime == true){ 
-				time = "T" + formatTimeOfDay($.now());
+				time = " " + formatTimeOfDay($.now());
 			}else{ 
-				time = "T00:00:00";
+				time = " 00:00:00";
 			}
 			var returnDateTime = twoDigitMonth + "/" + twoDigitDate + "/" + date.getFullYear() + time;
 			return returnDateTime;
