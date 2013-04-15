@@ -20,6 +20,13 @@
         initialize: function() {
           $input.click(function (event) {self.show(); return false;}).keydown(function(e){ if (e.keyCode == 13) { self.entered(); return false; }});
           $(document).keydown(function(e) { if (e.keyCode == 27) { self.hide(); }}).click(self.hide);
+          var date = new Date(year, currentMonth, $cell.text());
+	  $input.val(self.format(date)).change();
+	  if(options.iwItem)
+	  {
+		options.iwItem.setValue(self.formatISO(date));
+		options.iwItem.setReadOnly(true);
+	  }
           $container = self.initializeContainer().hide()
             .append(self.buildMonth(new Date()))
             .delegate(daySelector, 'click', self.clicked)
