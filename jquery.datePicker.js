@@ -20,7 +20,7 @@
         initialize: function() {
           $input.click(function (event) {self.show(); return false;}).keydown(function(e){ if (e.keyCode == 13) { self.entered(); return false; }});
           $(document).keydown(function(e) { if (e.keyCode == 27) { self.hide(); }}).click(self.hide);
-          var date = new Date(year, currentMonth, $cell.text());
+          var date = new Date();
 	  $input.val(self.format(date)).change();
 	  if(options.iwItem)
 	  {
