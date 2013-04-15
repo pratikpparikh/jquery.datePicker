@@ -6,7 +6,7 @@
       return this;
     }
 
-    var defaults = {selected: null, minimumDate: null, maximumDate: null,iwItem:null};
+    var defaults = {selected: null, minimumDate: null, maximumDate: null,iwItem:null,default:false};
     var months = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
     var abbreviations = new Array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec');
     var daySelector = 'td:not(.m):not(:empty)';
@@ -20,13 +20,15 @@
         initialize: function() {
           $input.click(function (event) {self.show(); return false;}).keydown(function(e){ if (e.keyCode == 13) { self.entered(); return false; }});
           $(document).keydown(function(e) { if (e.keyCode == 27) { self.hide(); }}).click(self.hide);
-          var date = new Date();
-	  $input.val(self.format(date)).change();
-	  if(options.iwItem)
-	  {
-		options.iwItem.setValue(self.formatISO(date));
-		options.iwItem.setReadOnly(true);
-	  }
+          if(options.default){
+	          var date = new Date();
+		  $input.val(self.format(date)).change();
+		  if(options.iwItem)
+		  {
+			options.iwItem.setValue(self.formatISO(date));
+			options.iwItem.setReadOnly(true);
+		  }
+          }
           $container = self.initializeContainer().hide()
             .append(self.buildMonth(new Date()))
             .delegate(daySelector, 'click', self.clicked)
