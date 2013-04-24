@@ -29,10 +29,10 @@
 			options.iwItem.setReadOnly(true);
 		  }
           }else if(options.defaultdate){
-		  $input.val(self.format(minimumDate)).change();
+		  $input.val(self.format(options.minimumDate)).change();
 		  if(options.iwItem)
 		  {
-			options.iwItem.setValue(self.formatISO(minimumDate));
+			options.iwItem.setValue(self.formatISO(options.minimumDate));
 			options.iwItem.setReadOnly(true);
 		  }	
           }
