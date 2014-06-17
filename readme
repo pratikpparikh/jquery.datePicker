@@ -1,1 +1,31 @@
 This is a simple and clean jQuery date picker. The goal is for it to be minimalistic and small. It can be shrank to less than 3KB uses Google Closure and gzip's down to ~1.2KB. Tested using jQuery 1.6.2 and Chrome 14, FF6 and IE9. It hopefully works in some older browsers as well.
+
+We have further enhanced it to working with TeamSite FormsPub.  YOu will need to include jQuery to use this plugin
+
+var startDateIWItem = IWDatacapture.getItem("/product-content-catalogue/Compliance/productCompliance/startDate");
+startDateIWItem.setReadOnly(true);
+var endDateIWItem = IWDatacapture.getItem("/product-content-catalogue/Compliance/productCompliance/endDate");
+endDateIWItem.setReadOnly(true);
+
+//find inputs in iframe form document
+var startDateInput = $(formframedocument).find("input[name='product-content-catalogue/Compliance/productCompliance/startDate']");
+var endDateInput = $(formframedocument).find("input[name='product-content-catalogue/Compliance/productCompliance/endDate']");
+
+//set min
+var minDateLimit = new Date(2012, 0, 0);
+minDateLimit.setHours(0, 0, 0, 0)
+
+//determine if a default date is present
+var startDateDefault = true;
+var endDateDefault = true;
+//alert(startDateIWItem.getValue());
+if (startDateIWItem.getValue() == null || startDateIWItem.getValue() == "") {
+    startDateDefault = true;
+} else {
+    startDateDefault = false;
+}
+if (endDateIWItem.getValue() == null || endDateIWItem.getValue() == "") {
+    endDateDefault = false;
+} else {
+    endDateDefault = false;
+}
