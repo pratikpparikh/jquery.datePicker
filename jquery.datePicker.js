@@ -1,3 +1,5 @@
+var datepickers = [];
+
 (function($){
   $.fn.datePicker = function(opts) {
 
@@ -18,8 +20,13 @@
       var $container = currentDate = mode = null;
       var self = {
         initialize: function() {
-          $input.click(function (event) {self.show(); return false;}).keydown(function(e){ if (e.keyCode == 13) { self.entered(); return false; }});
-          $(document).keydown(function(e) { if (e.keyCode == 27) { self.hide(); }}).click(self.hide);
+          $input.click(function (event) {
+            for(i in datepickers){
+                datepickers[i].hide();
+            }
+            self.toggle();
+            return false;
+          });
           if(options.systemdate){
 	          var date = new Date();
 		  $input.val(self.format(date)).change();
@@ -44,10 +51,15 @@
             .delegate('.next', 'click', self.loadNext)
             .delegate('.month', 'click', self.pickMonth)
             .delegate('.year', 'click', self.pickYear)
-            .click(function(){return false;});
+            .delegate('.close', 'click', self.toggle);
+
+          datepickers.push($container);
         },
         parseDate: function(value) { return new Date(value); },
-        toggle: function() { $container.is(':visible') ? self.hide() : self.show(); },
+        toggle: function() {
+            $container.empty().append(self.buildMonth(new Date()));
+            $container.is(':visible') ? self.hide() : self.show();
+        },
         show: function() { $container.show(); },
         hide: function() { $container.hide(); },
         loadPrevious: function() {
@@ -89,17 +101,19 @@
 			$input.val(self.format(date)).change();
 			if(options.iwItem)
 			{
-				options.iwItem.setValue(self.formatISO(date));
+			    var date = self.formatISO(date);
+			    //input validation
+			    if(date.search("[0-1][0-9]\/[0-3][0-9]\/[0-9]{4} [0-1][0-9]:[0-5][0-9]:[0-5][0-9]")==0){
+				    options.iwItem.setValue(date);
+			    }
+			    else{
+			        options.iwItem.setValue("");
+			    }
 				options.iwItem.setReadOnly(true);
 			}
 			if (options.selected != null) { options.selected(date, $cell); }
 			self.hide();
           }
-        },
-        entered: function() {
-          var date = self.parseDate($input.val().replace(/^\s*/, '').replace(/\s*$/, ''));
-          if (date == null) { return; }
-          $container.empty().append(self.buildMonth(date)).find(daySelector).eq(date.getDate()-1).click();
         },
         initializeContainer: function() {
           return $('<div>').addClass('calendar').insertAfter($input);
@@ -108,6 +122,15 @@
           mode = 'year';
           var year =  $container.find("td.year").text()
           var table = document.createElement('table');
+          var header = table.insertRow(-1);
+          //4 cols total
+          header.insertCell(-1);
+          header.insertCell(-1);
+          header.insertCell(-1);
+          var close = header.insertCell(-1);
+          close.className = 'close';
+          close.innerHTML = 'X';
+		
           var start = year - 6;
           if (options.minimumDate && options.minimumDate > start) { start = options.minimumDate.getFullYear(); }
           for (var i = 0; i < 3; ++i) {
@@ -137,6 +160,9 @@
           year.colSpan = 4;
           year.className = 'm year';
           year.innerHTML = yearString;
+          var close = header.insertCell(-1);
+          close.className = 'close';
+          close.innerHTML = 'X';
           
           //could make this static...
           for (var i = 0; i < 3; ++i) {
@@ -172,6 +198,7 @@
           self.addHeaderCell(header, '<div class="prev">&laquo;</div>', 1);
           self.addHeaderCell(header, '<div class="month">' + months[date.getMonth()] + ' ' + date.getFullYear() + '</div>', 5);
           self.addHeaderCell(header, '<div class="next">&raquo;</div>', 1);
+          self.addHeaderCell(header, '<div class="close">X</div>',1);
 
           var $table = $(table);
           if (options.minimumDate && options.minimumDate >= first) { $table.find('.prev').hide(); }
