@@ -2,6 +2,15 @@ This is a simple and clean jQuery date picker. The goal is for it to be minimali
 
 We have further enhanced it to working with TeamSite FormsPub.  YOu will need to include jQuery to use this plugin
 
+//get forms pub iframe and document into which to insert jquery events and styles
+var formframedocument = window.top.formframe.document;
+
+// insert datePicker css since DCT doesn't allow stylesheet link html
+var $head = $(formframedocument).contents().find("head");                
+$head.append($("<link/>", 
+           { rel: "stylesheet", href: "http://15.126.216.81/iw/datepicker/datePicker.css", type: "text/css" }));
+
+
 var startDateIWItem = IWDatacapture.getItem("/product-content-catalogue/Compliance/productCompliance/startDate");
 startDateIWItem.setReadOnly(true);
 var endDateIWItem = IWDatacapture.getItem("/product-content-catalogue/Compliance/productCompliance/endDate");
@@ -29,3 +38,13 @@ if (endDateIWItem.getValue() == null || endDateIWItem.getValue() == "") {
 } else {
     endDateDefault = false;
 }
+
+// initialize datePicker on the date field
+startDateInput.datePicker();
+endDateInput.datePicker();
+
+// bind datePicker toggle command to focus event of the date field
+startDateInput.focus(function() {
+     $(this).datePicker({command: 'toggle'});
+endDateInput.focus(function() {
+     $(this).datePicker({command: 'toggle'});
